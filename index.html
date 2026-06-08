@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-touch-icon" content="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' rx='40' fill='%231c1c1e'/%3E%3Cpath d='M60 50 L140 50 L120 150 L80 150 Z' fill='%230a84ff'/%3E%3Crect x='55' y='80' width='90' height='8' rx='4' fill='%23ffffff'/%3E%3C/svg%3E">
+    <title>Раскрой МДФ</title>
+    <style>
+        :root {
+            --bg-color: #000000;
+            --card-bg: #1c1c1e;
+            --accent: #0a84ff;
+            --accent-hover: #007aff;
+            --text-main: #ffffff;
+            --text-muted: #8e8e93;
+            --border: #38383a;
+            --success: #30d158;
+            --warning: #ff9f0a;
+            --waste-bg: #3a3a3c;
+        }
+        body { 
+            background-color: var(--bg-color); 
+            color: var(--text-main); 
+            padding: env(safe-area-inset-top, 15px) 15px env(safe-area-inset-bottom, 15px) 15px; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            line-height: 1.5; 
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+        h2 { margin-top: 5px; font-weight: 600; font-size: 24px; color: var(--text-main); letter-spacing: 0.5px; }
+        .card { 
+            background-color: var(--card-bg); 
+            border-radius: 14px; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        label { display: block; margin-bottom: 6px; font-size: 13px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+        textarea, input { 
+            width: 100%; 
+            background: #2c2c2e; 
+            color: var(--text-main); 
+            border: 1px solid var(--border); 
+            border-radius: 10px; 
+            padding: 12px; 
+            margin-bottom: 15px; 
+            box-sizing: border-box; 
+            font-size: 16px; 
+            -webkit-appearance: none;
+        }
+        textarea { height: 140px; resize: none; font-family: monospace; font-size: 15px; }
+        input:focus, textarea:focus { outline: none; border-color: var(--accent); }
+        .input-group { display: flex; gap: 12px; }
+        .input-group > div { flex: 1; }
+        button { 
+            background-color: var(--accent); 
+            color: white; 
+            padding: 16px; 
+            border: none; 
+            border-radius: 12px; 
+            width: 100%; 
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 17px; 
+            margin-top: 10px;
+            transition: background-color 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        button:active { background-color: var(--accent-hover); opacity: 0.8; }
+        .btn-copy { background-color: var(--success); color: #000; margin-top: 15px; box-shadow: 0 2px 10px rgba(48, 209, 88, 0.2); }
+        .stat-box { 
+            background: rgba(10, 132, 255, 0.1); 
+            padding: 16px; 
+            border-radius: 12px; 
+            text-align: center; 
+            margin-bottom: 20px; 
+            border: 1px solid rgba(10, 132, 255, 0.3); 
+        }
+        .visual-slat { 
+            height: 36px; 
+            background-color: var(--waste-bg); 
+            display: flex; 
+            margin: 12px 0; 
+            border-radius: 8px; 
+            overflow: hidden; 
+            border: 1px solid var(--border); 
+        }
+        .slat-part { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 13px; 
+            font-weight: 600; 
+            height: 100%; 
+            border-right: 1px solid var(--card-bg); 
+        }
+        .color-normal { background-color: var(--accent); color: white; }
+        .color-waste { background-color: var(--waste-bg); color: var(--text-muted); font-size: 11px; }
+        .instruction-card { 
+            background: #2c2c2e; 
+            border-radius: 10px; 
+            padding: 14px; 
+            margin-bottom: 12px; 
+        }
+        #text_for_whatsapp { width: 100%; height: 120px; background: #2c2c2e; color: var(--text-main); margin-top: 15px; display: none; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>📐 Раскрой МДФ</h2>
+        
+        <label>Заказ (ШхВ - Кол-во):</label>
+        <textarea id="order_input" inputmode="text">40х50 - 100
+30х20 - 350</textarea>
+        
+        <div class="input-group">
+            <div><label>Рейка (см):</label><input type="number" id="slat_len" value="272" inputmode="decimal"></div>
+            <div><label>В пачке (шт):</label><input type="number" id="pack_size" value="26" inputmode="numeric"></div>
+            <div><label>Диск (мм):</label><input type="number" id="blade" value="3" inputmode="decimal"></div>
+        </div>
+
+        <button onclick="run()">РАССЧИТАТЬ</button>
+    </div>
+
+    <div class="card" id="results" style="display: none;">
+        <div id="stats_area"></div>
+        <textarea id="text_for_whatsapp" readonly></textarea>
+        <button class="btn-copy" id="copy_btn" onclick="copyText()">📋 В WhatsApp</button>
+        <div id="map_area" style="margin-top: 25px;"></div>
+    </div>
+
+<script>
+function run() {
+    try {
+        var text = document.getElementById('order_input').value;
+        var slatLen = parseFloat(document.getElementById('slat_len').value);
+        var packSize = parseInt(document.getElementById('pack_size').value);
+        var blade = parseFloat(document.getElementById('blade').value) / 10;
+        
+        if (!text.trim()) { alert("Введите данные заказа!"); return; }
+
+        var regex = /(\d+(?:\.\d+)?)[\sхxX×*](\d+(?:\.\d+)?)[\s\-:=]+(\d+)/g;
+        var match; var demands = {};
+        while ((match = regex.exec(text)) !== null) {
+            var w = parseFloat(match[1]); var h = parseFloat(match[2]); var qty = parseInt(match[3]);
+            demands[w] = (demands[w] || 0) + (qty * 2); 
+            demands[h] = (demands[h] || 0) + (qty * 2);
+        }
+        
+        var uniqueLengths = Object.keys(demands).map(Number).sort((a,b) => b - a);
+        
+        var patterns = []; 
+        var currentPattern = new Array(uniqueLengths.length).fill(0);
+        
+        function gen(idx, curLen) {
+            if (idx === uniqueLengths.length) {
+                if (curLen > 0) patterns.push([...currentPattern]);
+                return;
+            }
+            var len = uniqueLengths[idx];
+            var maxP = Math.floor((slatLen - curLen) / (len + blade));
+            for (var i = maxP; i >= 0; i--) {
+                currentPattern[idx] = i;
+                gen(idx + 1, curLen + i * (len + blade));
+            }
+        }
+        gen(0, 0);
+        
+        var remaining = {...demands};
+        var plan = [];
+        
+        while (Object.values(remaining).some(v => v > 0)) {
+            var bestP = null;
+            var bestScore = -Infinity;
+            
+            for (var p of patterns) {
+                var score = 0;
+                var used = 0;
+                var hits = false;
+                
+                for (var i = 0; i < uniqueLengths.length; i++) {
+                    var len = uniqueLengths[i];
+                    var cnt = p[i];
+                    if (cnt === 0) continue;
+                    used += cnt * (len + blade);
+                    if (remaining[len] > 0) {
+                        score += Math.min(cnt, remaining[len]) * len;
+                        hits = true;
+                    }
+                }
+                if (!hits) continue;
+                
+                var rest = slatLen - used;
+                score = score - rest * 1.5; // штраф за остаток
+                
+                if (rest > 5 && rest < 30) score -= 1000; // штраф за плохой остаток
+                
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestP = p;
+                }
+            }
+            if (!bestP) break;
+            
+            var steps = 999999;
+            for (var i = 0; i < uniqueLengths.length; i++) {
+                if (bestP[i] > 0 && remaining[uniqueLengths[i]] > 0) {
+                    steps = Math.min(steps, Math.ceil(remaining[uniqueLengths[i]] / bestP[i]));
+                }
+            }
+            if (steps === 999999) steps = 1;
+            
+            for (var i = 0; i < uniqueLengths.length; i++) {
+                remaining[uniqueLengths[i]] -= bestP[i] * steps;
+            }
+            plan.push({pattern: bestP, count: steps});
+        }
+        
+        var total = plan.reduce((sum, p) => sum + p.count, 0);
+        var packs = Math.floor(total / packSize);
+        var loose = total % packSize;
+        
+        var waText = `📦 ЗАКАЗ В РАСПИЛ\nВсего реек: ${total} шт (${packs} пач. + ${loose} шт.)\n\n🛠 КАРТА РАСПИЛА:\n`;
+        
+        var statsHtml = `<div class="stat-box"><h3>Всего реек: ${total} шт</h3><p>${packs} пачек + ${loose} шт</p></div>`;
+        document.getElementById('stats_area').innerHTML = statsHtml;
+        
+        var html = '<h3 style="margin-bottom:15px;">Схема распила:</h3>';
+        plan.forEach((item, idx) => {
+            if (item.count === 0) return;
+            var countTxt = `${Math.floor(item.count/packSize)} пач.` + (item.count%packSize ? ` + ${item.count%packSize} шт.` : '');
+            waText += `\n${idx+1}. ${countTxt} (${item.count} шт)\n`;
+            
+            var visual = '<div class="visual-slat">';
+            var used = 0;
+            var parts = [];
+            for (var i = 0; i < uniqueLengths.length; i++) {
+                for (var c = 0; c < item.pattern[i]; c++) {
+                    visual += `<div class="slat-part color-normal" style="flex-grow: ${uniqueLengths[i]}">${uniqueLengths[i]}</div>`;
+                    used += uniqueLengths[i] + blade;
+                    parts.push(uniqueLengths[i]);
+                }
+            }
+            var rest = slatLen - used;
+            if (rest > 0.1) visual += `<div class="slat-part color-waste" style="flex-grow: ${rest}">${rest.toFixed(1)}</div>`;
+            visual += '</div>';
+            
+            html += `<div class="instruction-card"><b>Рез №${idx+1}</b> — ${countTxt}${visual}</div>`;
+        });
+        
+        document.getElementById('text_for_whatsapp').value = waText;
+        document.getElementById('text_for_whatsapp').style.display = 'block';
+        document.getElementById('map_area').innerHTML = html;
+        document.getElementById('results').style.display = 'block';
+        
+    } catch(e) {
+        alert("Ошибка: " + e.message);
+        console.error(e);
+    }
+}
+
+function copyText() {
+    var copyText = document.getElementById("text_for_whatsapp");
+    copyText.select();
+    document.execCommand("copy");
+    alert("Скопировано в буфер!");
+}
+</script>
+</body>
+</html>
