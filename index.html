@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#000000">
+    <title>Раскрой МДФ</title>
+    <style>
+        :root {
+            --bg-color: #000000;
+            --card-bg: #1c1c1e;
+            --accent: #0a84ff;
+            --accent-hover: #007aff;
+            --text-main: #ffffff;
+            --text-muted: #8e8e93;
+            --border: #38383a;
+            --success: #30d158;
+            --waste-bg: #3a3a3c;
+        }
+        body { 
+            background-color: var(--bg-color); 
+            color: var(--text-main); 
+            padding: env(safe-area-inset-top, 15px) 15px env(safe-area-inset-bottom, 15px) 15px; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            line-height: 1.5; 
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+        h2 { margin-top: 5px; font-weight: 600; font-size: 24px; color: var(--text-main); }
+        .card { 
+            background-color: var(--card-bg); 
+            border-radius: 14px; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        label { display: block; margin-bottom: 6px; font-size: 13px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+        textarea, input { 
+            width: 100%; 
+            background: #2c2c2e; 
+            color: var(--text-main); 
+            border: 1px solid var(--border); 
+            border-radius: 10px; 
+            padding: 12px; 
+            margin-bottom: 15px; 
+            box-sizing: border-box; 
+            font-size: 16px; 
+        }
+        textarea { height: 140px; resize: none; font-family: monospace; font-size: 15px; }
+        .input-group { display: flex; gap: 12px; }
+        .input-group > div { flex: 1; }
+        button { 
+            background-color: var(--accent); 
+            color: white; 
+            padding: 16px; 
+            border: none; 
+            border-radius: 12px; 
+            width: 100%; 
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 17px; 
+            margin-top: 10px;
+        }
+        button:active { background-color: var(--accent-hover); }
+        .btn-copy { background-color: var(--success); color: #000; margin-top: 15px; }
+        .visual-slat { 
+            height: 36px; 
+            background-color: var(--waste-bg); 
+            display: flex; 
+            margin: 12px 0; 
+            border-radius: 8px; 
+            overflow: hidden; 
+            border: 1px solid var(--border); 
+        }
+        .slat-part { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 13px; 
+            font-weight: 600; 
+            height: 100%; 
+            border-right: 1px solid var(--card-bg); 
+        }
+        .color-normal { background-color: var(--accent); color: white; }
+        .color-waste { background-color: var(--waste-bg); color: var(--text-muted); font-size: 11px; }
+        .color-bad { background-color: #ff3b30; color: white; font-size: 11px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>📐 Раскрой МДФ</h2>
+        
+        <label>Заказ (ШхВ - Кол-во):</label>
+        <textarea id="order_input" inputmode="text">40х50 - 100
+30х20 - 200</textarea>
+        
+        <div class="input-group">
+            <div><label>Рейка (см):</label><input type="number" id="slat_len" value="272" inputmode="decimal"></div>
+            <div><label>В пачке (шт):</label><input type="number" id="pack_size" value="26" inputmode="numeric"></div>
+            <div><label>Диск (мм):</label><input type="number" id="blade" value="3" inputmode="decimal"></div>
+        </div>
+
+        <button onclick="run()">РАССЧИТАТЬ</button>
+    </div>
+
+    <div class="card" id="results" style="display: none;">
+        <div id="stats_area"></div>
+        <textarea id="text_for_whatsapp" readonly style="width:100%; height:150px; background:#2c2c2e; color:white; margin-top:15px;"></textarea>
+        <button class="btn-copy" onclick="copyText()">📋 Скопировать для WhatsApp</button>
+        <div id="map_area" style="margin-top: 25px;"></div>
+    </div>
+
+<script>
+// Полный мощный алгоритм
+function run() {
+    try {
+        var text = document.getElementById('order_input').value.trim();
+        var slatLen = parseFloat(document.getElementById('slat_len').value);
+        var packSize = parseInt(document.getElementById('pack_size').value);
+        var blade = parseFloat(document.getElementById('blade').value) / 10;
+
+        if (!text) { alert("Введите заказ!"); return; }
+
+        // Парсинг заказа
+        var regex = /(\d+(?:\.\d+)?)[\sхxX×*](\d+(?:\.\d+)?)[\s\-:=]+(\d+)/g;
+        var match;
+        var demands = {};
+        while ((match = regex.exec(text)) !== null) {
+            var w = parseFloat(match[1]);
+            var h = parseFloat(match[2]);
+            var qty = parseInt(match[3]);
+            demands[w] = (demands[w] || 0) + qty * 2;
+            demands[h] = (demands[h] || 0) + qty * 2;
+        }
+
+        var uniqueLengths = Object.keys(demands).map(Number).filter(l => demands[l] > 0).sort((a,b) => b - a);
+
+        if (uniqueLengths.length === 0) {
+            alert("Не удалось распознать заказ");
+            return;
+        }
+
+        // Генерация паттернов
+        var patterns = [];
+        var currentPattern = new Array(uniqueLengths.length).fill(0);
+
+        function gen(idx, curLen) {
+            if (idx === uniqueLengths.length) {
+                if (curLen > 0) patterns.push([...currentPattern]);
+                return;
+            }
+            var len = uniqueLengths[idx];
+            var maxCount = Math.floor((slatLen - curLen) / (len + blade));
+            for (let i = maxCount; i >= 0; i--) {
+                currentPattern[idx] = i;
+                gen(idx + 1, curLen + i * (len + blade));
+            }
+        }
+        gen(0, 0);
+
+        // Улучшенный поиск лучших паттернов
+        var remaining = {...demands};
+        var plan = [];
+
+        while (Object.values(remaining).some(v => v > 0) && plan.length < 50) {
+            let bestP = null;
+            let bestScore = -Infinity;
+
+            for (let p of patterns) {
+                let score = 0;
+                let used = 0;
+                let variety = 0;
+                let hits = false;
+
+                for (let i = 0; i < uniqueLengths.length; i++) {
+                    let len = uniqueLengths[i];
+                    let cnt = p[i];
+                    if (cnt === 0) continue;
+                    used += cnt * (len + blade);
+                    if (remaining[len] > 0) {
+                        score += Math.min(cnt, remaining[len]) * len * 1.2; // бонус за большие детали
+                        hits = true;
+                        if (cnt > 0) variety++;
+                    }
+                }
+                if (!hits) continue;
+
+                let rest = slatLen - used;
+                score -= rest * 1.5; // штраф за отход
+
+                // Штраф за плохие обрезки 5-30см
+                if (rest > 5.1 && rest < 29.9) {
+                    score -= 800;
+                } else if (rest <= 5 || rest >= 30) {
+                    score += 300; // бонус за хорошие обрезки
+                }
+
+                // Бонус за разнообразие
+                if (variety >= 2) score += 400;
+
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestP = p;
+                }
+            }
+
+            if (!bestP) break;
+
+            let steps = 999999;
+            for (let i = 0; i < uniqueLengths.length; i++) {
+                if (bestP[i] > 0 && remaining[uniqueLengths[i]] > 0) {
+                    steps = Math.min(steps, Math.ceil(remaining[uniqueLengths[i]] / bestP[i]));
+                }
+            }
+            if (steps === 999999) steps = 1;
+
+            for (let i = 0; i < uniqueLengths.length; i++) {
+                remaining[uniqueLengths[i]] -= bestP[i] * steps;
+            }
+            plan.push({pattern: bestP, count: steps});
+        }
+
+        // Расчёт итогов
+        let total = plan.reduce((sum, p) => sum + p.count, 0);
+        let packs = Math.floor(total / packSize);
+        let loose = total % packSize;
+
+        let waText = `📦 ЗАКАЗ В РАСПИЛ\nВсего реек: ${total} шт (${packs} пач. + ${loose} шт.)\n\n🛠 КАРТА РАСПИЛА:\n`;
+
+        let statsHtml = `<div style="background:#1c1c1e; padding:16px; border-radius:12px; text-align:center; margin-bottom:20px;">
+            <h3 style="margin:0; color:#0a84ff;">Всего реек: ${total} шт</h3>
+            <p>${packs} пачек + ${loose} шт</p>
+        </div>`;
+
+        let html = '<h3 style="margin:15px 0 10px;">Схема распила:</h3>';
+
+        plan.forEach((item, idx) => {
+            if (item.count === 0) return;
+            let p = Math.floor(item.count / packSize);
+            let l = item.count % packSize;
+            let countTxt = p > 0 ? `${p} пач.` + (l > 0 ? ` + ${l} шт.` : '') : `${l} шт.`;
+
+            waText += `${idx+1}. ${countTxt}\n`;
+
+            let visual = '<div class="visual-slat">';
+            let used = 0;
+            let parts = [];
+
+            for (let i = 0; i < uniqueLengths.length; i++) {
+                for (let c = 0; c < item.pattern[i]; c++) {
+                    visual += `<div class="slat-part color-normal" style="flex-grow:${uniqueLengths[i]}">${uniqueLengths[i]}</div>`;
+                    used += uniqueLengths[i] + blade;
+                    parts.push(uniqueLengths[i]);
+                }
+            }
+
+            let rest = slatLen - used;
+            if (rest > 0.1) {
+                let restClass = (rest > 5.1 && rest < 29.9) ? 'color-bad' : 'color-waste';
+                visual += `<div class="slat-part ${restClass}" style="flex-grow:${rest}">${rest.toFixed(1)}</div>`;
+            }
+            visual += '</div>';
+
+            html += `<div style="background:#2c2c2e; padding:14px; border-radius:10px; margin-bottom:12px;">
+                <b>Рез №${idx+1}</b> — ${countTxt}
+                ${visual}
+            </div>`;
+        });
+
+        document.getElementById('stats_area').innerHTML = statsHtml;
+        document.getElementById('text_for_whatsapp').value = waText;
+        document.getElementById('map_area').innerHTML = html;
+        document.getElementById('results').style.display = 'block';
+    } catch(e) {
+        alert("Ошибка: " + e.message);
+        console.error(e);
+    }
+}
+
+function copyText() {
+    var ta = document.getElementById("text_for_whatsapp");
+    ta.select();
+    document.execCommand("copy");
+    alert("✅ Скопировано в буфер! Можно вставлять в WhatsApp.");
+}
+</script>
+</body>
+</html>
