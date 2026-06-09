@@ -327,9 +327,20 @@ function run() {
         var waText = "📦 ЗАКАЗ В РАСПИЛ\nВсего реек: " + total + " шт (" + packs + " пач. + " + loose + " шт.)\n";
         waText += "\n🛠 КАРТА РАСПИЛА:\n";
 
-        var statsHtml = '<div class="stat-box">' +
-            '<h3>Всего реек: ' + total + ' шт</h3>' +
-            '<p>' + packs + ' пачек + ' + loose + ' шт</p></div>';
+        var statsHtml =
+'<div class="stat-box">' +
+
+'<div style="font-size:14px;color:#8e8e93;margin-bottom:10px;">ВСЕГО РЕЕК</div>' +
+
+'<div style="font-size:48px;font-weight:800;color:white;line-height:1;">'
++ total +
+'</div>' +
+
+'<div style="margin-top:15px;font-size:18px;color:#4da3ff;font-weight:600;">'
++ packs + ' пач. + ' + loose + ' шт.'
++ '</div>' +
+
+'</div>';
         document.getElementById('stats_area').innerHTML = statsHtml;
         
         var html = '<h3 style="margin-bottom:15px;">Схема распила:</h3>';
