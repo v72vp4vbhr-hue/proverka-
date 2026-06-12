@@ -2,243 +2,441 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <title>Раскрой МДФ</title>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Раскрой МДФ">
+    <meta name="theme-color" content="#007aff">
+    <title>Раскрой МДФ — Liquid Glass</title>
+    
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="manifest" href="manifest.json">
+    
     <style>
-        :root {
-            --bg-color: #f2f2f7;
-            --card-bg: #ffffff;
-            --accent: #007aff;
-            --text-main: #000000;
-            --text-muted: #6e6e73;
-            --border: #d1d1d6;
-            --success: #34c759;
-            --waste-bg: #e5e5ea;
-        }
-        body { 
-            background-color: var(--bg-color); 
-            color: var(--text-main); 
-            padding: env(safe-area-inset-top, 15px) 15px env(safe-area-inset-bottom, 15px) 15px; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            line-height: 1.5; margin: 0; -webkit-font-smoothing: antialiased;
-        }
-        h2, h3 { margin-top: 5px; font-weight: 600; color: var(--text-main); }
-        .card { background-color: var(--card-bg); border-radius: 14px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        label { display: block; margin-bottom: 6px; font-size: 13px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
-        textarea, input { 
-            width: 100%; background: #ffffff; color: var(--text-main); border: 1px solid var(--border); 
-            border-radius: 10px; padding: 12px; margin-bottom: 15px; box-sizing: border-box; font-size: 16px; 
-            -webkit-appearance: none;
-        }
-        textarea { height: 140px; resize: none; font-family: monospace; font-size: 15px; }
-        input:focus, textarea:focus { outline: none; border-color: var(--accent); }
-        .input-group { display: flex; gap: 12px; }
-        .input-group > div { flex: 1; }
-        button { 
-            background-color: var(--accent); color: white; padding: 16px; border: none; 
-            border-radius: 12px; width: 100%; cursor: pointer; font-weight: 600; font-size: 17px; 
-            margin-top: 10px; transition: background-color 0.2s; -webkit-tap-highlight-color: transparent;
-        }
-        button:active { opacity: 0.8; }
-        .btn-copy { background-color: var(--success); color: white; margin-top: 15px; }
-
-        .stat-box { background: #e8f2ff; padding: 16px; border-radius: 12px; text-align: center; margin-bottom: 20px; border: 1px solid rgba(0, 122, 255, 0.2); }
-        .stat-box h3 { margin: 0 0 5px 0; font-size: 20px; color: var(--accent); }
-        .stat-box p { margin: 0; color: var(--text-muted); font-size: 14px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        .visual-slat { height: 36px; background-color: var(--waste-bg); display: flex; margin: 12px 0; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
-        .slat-part { display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; height: 100%; border-right: 1px solid var(--card-bg); }
-        .color-normal { background-color: var(--accent); color: white; }
-        .color-waste { background-color: var(--waste-bg); color: var(--text-muted); font-size: 11px; }
-        .instruction-card { background: #f9f9fb; border-radius: 10px; padding: 14px; margin-bottom: 12px; border: 1px solid var(--border); }
-        #text_for_whatsapp { width: 100%; height: 120px; background: #ffffff; color: var(--text-main); margin-top: 15px; display: none; border: 1px solid var(--border); border-radius: 10px; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: var(--bg-color); }
-        ::-webkit-scrollbar-thumb { background: #c1c1c6; border-radius: 3px; }
+        body {
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100"><rect width="100" height="100" fill="%2324262b"/><circle cx="30" cy="30" r="25" fill="%234a6da7" opacity="0.4"/><circle cx="70" cy="60" r="35" fill="%235e3a6b" opacity="0.3"/><circle cx="80" cy="20" r="20" fill="%233c6e5f" opacity="0.3"/></svg>');
+            background-size: 200px 200px;
+            background-color: #1c1c1e;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+            padding: calc(env(safe-area-inset-top, 20px) + 10px) 16px 40px 16px;
+            min-height: 100vh;
+        }
+        
+        /* Стеклянный эффект Liquid Glass */
+        .glass-card {
+            background: rgba(30, 30, 35, 0.6);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border-radius: 28px;
+            border: 0.5px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        /* Более плотное стекло для важных блоков */
+        .glass-card-strong {
+            background: rgba(40, 40, 45, 0.7);
+            backdrop-filter: blur(50px);
+            -webkit-backdrop-filter: blur(50px);
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 28px;
+            margin-top: 8px;
+        }
+        .header-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(120, 120, 128, 0.2);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            border: 0.5px solid rgba(255, 255, 255, 0.3);
+        }
+        .header-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .header-text h1 { 
+            font-size: 28px; 
+            font-weight: 700; 
+            background: linear-gradient(135deg, #fff 0%, #a5a5b0 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .header-text p { font-size: 14px; color: rgba(255,255,255,0.7); }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: rgba(255,255,255,0.9);
+            letter-spacing: -0.2px;
+        }
+        
+        label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.6);
+            display: block;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+        
+        textarea, input {
+            width: 100%;
+            background: rgba(50, 50, 55, 0.6);
+            backdrop-filter: blur(10px);
+            border: 0.5px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 14px 16px;
+            font-size: 16px;
+            color: #ffffff;
+            margin-bottom: 20px;
+            outline: none;
+            transition: all 0.2s;
+        }
+        textarea:focus, input:focus {
+            border-color: rgba(0, 122, 255, 0.8);
+            background: rgba(60, 60, 65, 0.8);
+        }
+        textarea::placeholder, input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+        
+        .input-group { display: flex; gap: 12px; flex-wrap: wrap; }
+        .input-group > div { flex: 1; min-width: 100px; }
+        
+        button {
+            background: #007aff;
+            color: white;
+            border: none;
+            border-radius: 18px;
+            padding: 16px;
+            font-size: 17px;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 12px rgba(0,122,255,0.3);
+        }
+        button:active { transform: scale(0.97); background: #005fc1; }
+        
+        .results-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .result-item {
+            flex: 1;
+            background: rgba(50, 50, 55, 0.5);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 16px;
+            text-align: center;
+            border: 0.5px solid rgba(255,255,255,0.1);
+        }
+        .result-item .value { font-size: 34px; font-weight: 700; color: #0a84ff; }
+        .result-item .label { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 6px; }
+        
+        .copy-btn {
+            background: #34c759;
+            color: #000;
+            box-shadow: 0 4px 12px rgba(52,199,89,0.3);
+        }
+        .copy-btn:active { background: #28a745; }
+        
+        .visual-slat {
+            height: 44px;
+            background: rgba(60, 60, 65, 0.6);
+            display: flex;
+            margin: 16px 0 12px 0;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+        .slat-part {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            background: #007aff;
+            color: white;
+        }
+        .color-waste {
+            background: rgba(80, 80, 85, 0.8);
+            color: rgba(255,255,255,0.5);
+        }
+        
+        .instruction-card {
+            background: rgba(40, 40, 45, 0.5);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 14px;
+            border: 0.5px solid rgba(255,255,255,0.1);
+        }
+        .inst-header {
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 16px;
+            color: #0a84ff;
+        }
+        .pattern-text {
+            font-family: monospace;
+            font-size: 13px;
+            background: rgba(30,30,35,0.6);
+            padding: 8px 12px;
+            border-radius: 14px;
+            margin: 8px 0;
+            color: rgba(255,255,255,0.9);
+        }
+        
+        #text_for_whatsapp {
+            width: 100%;
+            background: rgba(30,30,35,0.8);
+            backdrop-filter: blur(10px);
+            border: 0.5px solid rgba(255,255,255,0.15);
+            border-radius: 16px;
+            padding: 14px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #fff;
+            margin-bottom: 12px;
+            display: none;
+            resize: vertical;
+        }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2>📐 Раскрой МДФ</h2>
 
-        <label>Заказ (ШхВ - Кол-во):</label>
-        <textarea id="order_input" inputmode="text">30х20 - 350
+<div class="header">
+    <div class="header-icon">
+        <img src="icon.png" alt="Дисковая пила с линейкой">
+    </div>
+    <div class="header-text">
+        <h1>Раскрой МДФ</h1>
+        <p>Профессиональный калькулятор раскроя</p>
+    </div>
+</div>
+
+<div class="glass-card">
+    <div class="section-title">📐 Параметры расчёта</div>
+    <label>Заказ (ШхВ - Кол-во):</label>
+    <textarea id="order_input">30х20 - 350
 40х25 - 200</textarea>
-        
-        <div class="input-group">
-            <div><label>Рейка (см):</label><input type="number" id="slat_len" value="270"></div>
-            <div><label>В пачке (шт):</label><input type="number" id="pack_size" value="26"></div>
-            <div><label>Диск (мм):</label><input type="number" id="blade" value="3"></div>
-        </div>
-        
-        <button onclick="run()">РАССЧИТАТЬ</button>
+    <div class="input-group">
+        <div><label>Рейка (см):</label><input type="number" id="slat_len" value="272" step="any"></div>
+        <div><label>В пачке (шт):</label><input type="number" id="pack_size" value="26"></div>
+        <div><label>Диск (мм):</label><input type="number" id="blade" value="3" step="any"></div>
     </div>
+    <button onclick="runCalc()">🪚 РАССЧИТАТЬ</button>
+</div>
 
-    <div class="card" id="results" style="display: none;">
-        <div id="stats_area"></div>
-        <textarea id="text_for_whatsapp" readonly></textarea>
-        <button class="btn-copy" onclick="copyText()">📋 В WhatsApp</button>
-        <div id="map_area" style="margin-top: 25px;"></div>
-    </div>
+<div class="glass-card" id="results" style="display: none;">
+    <div class="section-title">📊 Результаты</div>
+    <div id="stats_area"></div>
+    <div class="section-title">📋 Заказ в распил</div>
+    <textarea id="text_for_whatsapp" readonly></textarea>
+    <button class="copy-btn" onclick="copyText()">📲 Скопировать для WhatsApp</button>
+    <div class="section-title">🛠 Схема распила</div>
+    <div id="map_area"></div>
+</div>
 
 <script>
-function run() {
+function runCalc() {
     try {
-        var text = document.getElementById('order_input').value;
-        var slatLen = parseFloat(document.getElementById('slat_len').value);
-        var packSize = parseInt(document.getElementById('pack_size').value);
-        var blade = parseFloat(document.getElementById('blade').value) / 10;
+        let orderText = document.getElementById('order_input').value;
+        let slatLen = parseFloat(document.getElementById('slat_len').value);
+        let packSize = parseInt(document.getElementById('pack_size').value);
+        let bladeMM = parseFloat(document.getElementById('blade').value);
+        let blade = bladeMM / 10;
         
-        if (!text.trim()) { alert("Введите данные заказа!"); return; }
-
-        var regex = /(\d+(?:\.\d+)?)[\sхxX×*](\d+(?:\.\d+)?)[\s\-:=]+(\d+)/g;
-        var match; var demands = {};
-        while ((match = regex.exec(text)) !== null) {
-            var w = parseFloat(match[1]); var h = parseFloat(match[2]); var qty = parseInt(match[3]);
-            demands[w] = (demands[w] || 0) + (qty * 2); demands[h] = (demands[h] || 0) + (qty * 2);
+        if (!orderText.trim()) throw new Error('Введите заказ');
+        if (isNaN(slatLen) || slatLen <= 0) throw new Error('Длина рейки > 0');
+        
+        let demands = {};
+        let regex = /(\d+(?:\.\d+)?)[\sхxX×*](\d+(?:\.\d+)?)[\s\-:=]+(\d+)/g;
+        let m;
+        while ((m = regex.exec(orderText)) !== null) {
+            let w = parseFloat(m[1]), h = parseFloat(m[2]), qty = parseInt(m[3]);
+            demands[w] = (demands[w] || 0) + qty * 2;
+            demands[h] = (demands[h] || 0) + qty * 2;
         }
+        if (Object.keys(demands).length === 0) throw new Error('Формат: 30х20 - 350');
         
-        var hasDemands = false;
-        for (var k in demands) { if (demands.hasOwnProperty(k)) { hasDemands = true; break; } }
-        if (!hasDemands) { alert("Неверный формат ввода. Образец: 30х20 - 350"); return; }
+        let lengths = Object.keys(demands).map(Number).sort((a,b)=>b-a);
         
-        var uniqueLengths = [];
-        for (var k in demands) {
-            if (demands.hasOwnProperty(k) && demands[k] > 0) { uniqueLengths.push(Number(k)); }
+        let patterns = [];
+        let cur = new Array(lengths.length).fill(0);
+        function generate(idx, usedLen) {
+            if (idx === lengths.length) {
+                if (usedLen > 0) patterns.push([...cur]);
+                return;
+            }
+            let maxCnt = Math.floor((slatLen - usedLen) / (lengths[idx] + blade));
+            for (let i = maxCnt; i >= 0; i--) {
+                cur[idx] = i;
+                generate(idx+1, usedLen + i * (lengths[idx] + blade));
+            }
         }
-        uniqueLengths.sort(function(a, b) { return b - a; });
+        generate(0, 0);
         
-        if (uniqueLengths.length === 0) {
-            document.getElementById('stats_area').innerHTML = '<div class="stat-box"><h3>✅ Заказ пуст</h3></div>';
-            document.getElementById('results').style.display = 'block';
-            return;
-        }
+        let need = {};
+        for (let k in demands) need[k] = demands[k];
         
-        var patterns = []; 
-        var currentPattern = [];
-        for (var i = 0; i < uniqueLengths.length; i++) { currentPattern.push(0); }
+        let plan = [];
+        let safety = 0;
         
-        function gen(idx, curLen) {
-            if(idx === uniqueLengths.length) { if(curLen > 0) patterns.push(currentPattern.slice()); return; }
-            var len = uniqueLengths[idx];
-            var maxP = Math.floor((slatLen - curLen) / (len + blade));
-            for(var i=maxP; i>=0; i--) { currentPattern[idx] = i; gen(idx+1, curLen + i*(len+blade)); }
-        }
-        gen(0,0);
-        
-        var remaining = {};
-        for (var k in demands) { if (demands.hasOwnProperty(k)) { remaining[k] = demands[k]; } }
-        
-        function hasRemainingItems(rem) {
-            for (var k in rem) { if (rem.hasOwnProperty(k) && rem[k] > 0) return true; }
+        function hasNeed() {
+            for (let k in need) if (need[k] > 0) return true;
             return false;
         }
         
-        var plan = []; var safety = 0;
-        
-        while(hasRemainingItems(remaining) && safety++ < 2000) {
-            var bestP = null; var bestScore = -Infinity;
+        while (hasNeed() && safety++ < 2000) {
+            let bestPattern = null;
+            let bestScore = -Infinity;
             
-            for(var idxP=0; idxP<patterns.length; idxP++) {
-                var p = patterns[idxP];
-                var score = 0; var used = 0; var hits = false;
-                
-                for(var i=0; i<uniqueLengths.length; i++) {
-                    var len = uniqueLengths[i]; var cnt = p[i]; if(cnt===0) continue;
-                    used += cnt * (len+blade);
-                    if(remaining[len] > 0) { 
-                        score += Math.min(cnt, remaining[len]) * len; 
-                        hits = true; 
+            for (let p of patterns) {
+                let usedLen = 0;
+                let score = 0;
+                let hits = false;
+                for (let i=0; i<lengths.length; i++) {
+                    let cnt = p[i];
+                    if (cnt === 0) continue;
+                    let len = lengths[i];
+                    usedLen += cnt * (len + blade);
+                    if (need[len] > 0) {
+                        score += Math.min(cnt, need[len]) * len;
+                        hits = true;
                     }
                 }
-                if(!hits) continue;
-                
-                var rest = slatLen - used;
-                score -= rest;
-                
-                if(score > bestScore) { bestScore = score; bestP = p; }
-            }
-            if(!bestP) break;
-            
-            var steps = 999999;
-            for(var i=0; i<uniqueLengths.length; i++) {
-                if(bestP[i] > 0 && remaining[uniqueLengths[i]] > 0) {
-                    steps = Math.min(steps, Math.ceil(remaining[uniqueLengths[i]] / bestP[i]));
+                if (!hits) continue;
+                let waste = slatLen - usedLen;
+                score -= waste;
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestPattern = p;
                 }
             }
-            if(steps === 999999) steps = 1;
-            for(var i=0; i<uniqueLengths.length; i++) remaining[uniqueLengths[i]] -= bestP[i] * steps;
-            plan.push({pattern: bestP, count: steps});
+            if (!bestPattern) break;
+            
+            let steps = Infinity;
+            for (let i=0; i<lengths.length; i++) {
+                if (bestPattern[i] > 0 && need[lengths[i]] > 0) {
+                    steps = Math.min(steps, Math.ceil(need[lengths[i]] / bestPattern[i]));
+                }
+            }
+            if (!isFinite(steps)) steps = 1;
+            
+            for (let i=0; i<lengths.length; i++) {
+                need[lengths[i]] -= bestPattern[i] * steps;
+            }
+            plan.push({ pattern: bestPattern, count: steps });
         }
         
-        var total = 0; 
-        for (var i = 0; i < plan.length; i++) { total += plan[i].count; }
+        let totalSticks = plan.reduce((s,item)=>s+item.count,0);
+        let packs = Math.floor(totalSticks / packSize);
+        let loose = totalSticks % packSize;
         
-        var packs = Math.floor(total/packSize); var loose = total % packSize;
+        document.getElementById('stats_area').innerHTML = `
+            <div class="results-grid">
+                <div class="result-item"><div class="value">${totalSticks} шт</div><div class="label">Всего реек</div></div>
+                <div class="result-item"><div class="value">${packs}</div><div class="label">Пачек</div></div>
+                <div class="result-item"><div class="value">${loose}</div><div class="label">Остаток</div></div>
+            </div>
+        `;
         
-        var waText = "📦 ЗАКАЗ В РАСПИЛ\nВсего реек: " + total + " шт (" + packs + " пач. + " + loose + " шт.)\n";
-        waText += "\n🛠 КАРТА РАСПИЛА:\n";
-
-        var statsHtml = '<div class="stat-box">' +
-            '<h3>Всего реек: ' + total + ' шт</h3>' +
-            '<p>' + packs + ' пачек + ' + loose + ' шт</p>' +
-            '</div>';
-        document.getElementById('stats_area').innerHTML = statsHtml;
+        let waText = `📦 ЗАКАЗ В РАСПИЛ\nВсего реек: ${totalSticks} шт (${packs} пач. + ${loose} шт.)\n\n🛠 КАРТА РАСПИЛА:\n`;
+        let htmlMap = '';
         
-        var html = '<h3 style="margin-bottom:15px;">Схема распила:</h3>';
-        for (var idx = 0; idx < plan.length; idx++) {
-            var item = plan[idx];
+        for (let idx=0; idx<plan.length; idx++) {
+            let item = plan[idx];
             if (item.count === 0) continue;
+            let pCount = Math.floor(item.count / packSize);
+            let lCount = item.count % packSize;
+            let countTxt = pCount > 0 ? (pCount + ' пач.' + (lCount > 0 ? ` и ${lCount} шт.` : '')) : (lCount + ' шт.');
             
-            var p = Math.floor(item.count/packSize); var l = item.count%packSize;
-            var countTxt = p>0 ? (p + ' пач.' + (l>0 ? ' и ' + l + ' шт.' : '')) : (l + ' шт.');
-            waText += "\n" + (idx+1) + ". Пилить: " + countTxt + " (всего " + item.count + " реек)\nСхема: ";
-            
-            var visual = '<div class="visual-slat">'; var used = 0;
-            var parts = [];
-            for(var i=0; i<uniqueLengths.length; i++) {
-                for(var c=0; c<item.pattern[i]; c++) {
-                    visual += '<div class="slat-part color-normal" style="flex-grow: ' + uniqueLengths[i] + '">' + uniqueLengths[i] + '</div>';
-                    used += uniqueLengths[i] + blade;
-                    parts.push(uniqueLengths[i]);
+            let counts = {};
+            for (let i=0; i<lengths.length; i++) {
+                if (item.pattern[i] > 0) {
+                    counts[lengths[i]] = item.pattern[i];
                 }
             }
-            waText += parts.join(' + ') + '\n';
             
-            var rest = slatLen - used;
-            if(rest > 0.1) visual += '<div class="slat-part color-waste" style="flex-grow: ' + rest + '">' + rest.toFixed(1) + '</div>';
+            let partsList = [];
+            for (let len in counts) {
+                partsList.push(`${len} см — ${counts[len]} шт`);
+            }
+            let partsText = partsList.join(', ');
+            
+            let usedLenTotal = 0;
+            for (let i=0; i<lengths.length; i++) {
+                usedLenTotal += item.pattern[i] * (lengths[i] + blade);
+            }
+            let rest = slatLen - usedLenTotal;
+            
+            waText += `\n${idx+1}. Пилить: ${countTxt} (${item.count} реек)\n${partsText}${rest > 0.1 ? `, отход ${rest.toFixed(1)} см` : ''}\n`;
+            
+            let visual = '<div class="visual-slat">';
+            let visUsed = 0;
+            for (let i=0; i<lengths.length; i++) {
+                for (let c=0; c<item.pattern[i]; c++) {
+                    visual += `<div class="slat-part" style="flex-grow: ${lengths[i]}">${lengths[i]}</div>`;
+                    visUsed += lengths[i] + blade;
+                }
+            }
+            let visRest = slatLen - visUsed;
+            if (visRest > 0.1) visual += `<div class="slat-part color-waste" style="flex-grow: ${visRest}">${visRest.toFixed(1)}</div>`;
             visual += '</div>';
             
-            html += '<div class="instruction-card">' +
-                '<span style="color:var(--accent); font-weight:600;">Рез №' + (idx+1) + '</span> — Пилить: <b>' + countTxt + '</b>' +
-                visual +
-            '</div>';
+            htmlMap += `
+                <div class="instruction-card">
+                    <div class="inst-header">🪚 Рез №${idx+1} — Пилить: ${countTxt}</div>
+                    <div class="pattern-text">📏 ${partsText}${rest > 0.1 ? `, отход ${rest.toFixed(1)} см` : ''}</div>
+                    ${visual}
+                </div>
+            `;
         }
         
         document.getElementById('text_for_whatsapp').value = waText;
         document.getElementById('text_for_whatsapp').style.display = 'block';
-        document.getElementById('map_area').innerHTML = html;
+        document.getElementById('map_area').innerHTML = htmlMap;
         document.getElementById('results').style.display = 'block';
+        document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
         
-        document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        
-    } catch(e) { alert("Ошибка при расчете: " + e.message); }
+    } catch(e) {
+        alert('Ошибка: ' + e.message);
+    }
 }
 
 function copyText() {
-    var copyText = document.getElementById("text_for_whatsapp");
-    copyText.select();
-    document.execCommand("copy");
-    
-    var btn = document.getElementById("copy_btn");
-    var originalText = btn.innerHTML;
-    btn.innerHTML = "✅ Скопировано!";
-    
-    setTimeout(function() {
-        btn.innerHTML = originalText;
-    }, 2000);
+    let txt = document.getElementById('text_for_whatsapp');
+    txt.select();
+    txt.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(txt.value).then(() => {
+        let btn = document.querySelector('.copy-btn');
+        let orig = btn.innerHTML;
+        btn.innerHTML = '✅ Скопировано!';
+        setTimeout(() => btn.innerHTML = orig, 2000);
+    });
 }
 </script>
 </body>
