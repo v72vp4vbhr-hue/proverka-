@@ -48,7 +48,7 @@
         .header-text h1 { font-size: 28px; font-weight: 700; color: #1c1c1e; }
         .header-text p { font-size: 14px; color: #6c6c70; }
         
-        /* --- УЛУЧШЕНИЕ 3: Эффект стекла (Glassmorphism) --- */
+        /* --- Эффект стекла (Glassmorphism) --- */
         .card {
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(20px);
@@ -60,7 +60,7 @@
             border: 1px solid rgba(255,255,255,0.6);
         }
         
-        /* --- УЛУЧШЕНИЕ 5: Декоративная линия под заголовками --- */
+        /* --- Декоративная линия под заголовками --- */
         .section-title {
             font-size: 20px;
             font-weight: 600;
@@ -106,7 +106,7 @@
         .input-group { display: flex; gap: 12px; flex-wrap: wrap; }
         .input-group > div { flex: 1; min-width: 100px; }
         
-        /* --- УЛУЧШЕНИЕ 2: Градиентная кнопка --- */
+        /* --- Градиентная кнопка --- */
         button.primary {
             background: linear-gradient(145deg, #007aff, #0055d4);
             box-shadow: 0 4px 12px rgba(0, 122, 255, 0.35);
@@ -158,38 +158,32 @@
         .result-item .value { font-size: 32px; font-weight: 700; color: #007aff; }
         .result-item .label { font-size: 13px; color: #6c6c70; margin-top: 6px; }
         
-        /* --- УЛУЧШЕНИЕ 1: Объёмные полоски с тенями --- */
+        /* --- ВОЗВРАТ: Плоские ровные полоски без скруглений и теней --- */
         .visual-slat {
-            height: 48px;
-            background: #e8ecf0;
-            border-radius: 14px;
-            overflow: hidden;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.05);
-            position: relative;
+            height: 44px;
+            background: #e9e9ef; /* Цвет для отходов */
+            display: flex;
             margin: 16px 0 12px 0;
+            border-radius: 0; /* Убрали скругление */
+            overflow: hidden; /* Убрали, чтобы не было лишнего обрезания (но оставил для безопасности) */
         }
         .slat-part {
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 13px;
-            font-weight: 700;
-            color: #fff;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-            position: relative;
-            border-right: 2px solid rgba(255,255,255,0.15);
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            border-right: 1px solid rgba(255,255,255,0.3); /* Лёгкая граница между кусками */
         }
-        .slat-part:first-child { border-radius: 14px 0 0 14px; }
-        .slat-part:last-child { border-radius: 0 14px 14px 0; border-right: none; }
         .color-waste {
-            background: #e8ecf0 !important;
+            background: #e9e9ef !important; /* Цвет отхода */
             color: #8e8e93;
-            text-shadow: none;
             font-weight: 500;
             border-right: none;
         }
         
-        /* --- УЛУЧШЕНИЕ 4: Микро-анимация карточек схем --- */
+        /* --- Микро-анимация карточек схем --- */
         .instruction-card {
             background: rgba(245, 245, 247, 0.8);
             border-radius: 18px;
@@ -385,7 +379,7 @@ function runCalc() {
         let waText = `📦 ЗАКАЗ В РАСПИЛ\nВсего реек: ${totalSticks} шт (${packs} пач. + ${loose} шт.)\n\n🛠 КАРТА РАСПИЛА:\n`;
         let htmlMap = '';
         
-        const icons = ['🔵', '🟢', '🟠', '🟣', '🔴', '🟡', '🟤', '⚪️'];
+        const icons = ['🟢', '🟠', '🟣', '🔴', '🟡', '🔵', '🟤', '⚪️'];
         
         const colorPalette = [
             '#007aff', '#34c759', '#ff9500', '#af52de', 
@@ -424,6 +418,7 @@ function runCalc() {
             
             waText += `\n${idx+1}. Пилить: ${countTxt} (${item.count} реек)\n${partsText}${rest > 0.1 ? `, отход ${rest.toFixed(1)} см` : ''}\n`;
             
+            // --- СБОРКА ПОЛОСКИ БЕЗ СКРУГЛЕНИЙ ---
             let visual = '<div class="visual-slat">';
             let visUsed = 0;
             for (let i=0; i<lengths.length; i++) {
