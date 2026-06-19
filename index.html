@@ -139,7 +139,6 @@
             justify-content: center;
             font-size: 12px;
             font-weight: 600;
-            background: #007aff;
             color: white;
         }
         .color-waste {
@@ -340,6 +339,23 @@ function runCalc() {
         // --- УЛУЧШЕНИЕ 4: Цветные иконки для схем ---
         const icons = ['🔵', '🟢', '🟠', '🟣', '🔴', '🟡', '🟤', '⚪️'];
         
+        // --- НОВОЕ: Палитра для разных размеров в полоске ---
+        const colorPalette = [
+            '#007aff', // Синий
+            '#34c759', // Зелёный
+            '#ff9500', // Оранжевый
+            '#af52de', // Фиолетовый
+            '#ff3b30', // Красный
+            '#ffcc00', // Жёлтый
+            '#5ac8fa', // Голубой
+            '#ff2d92'  // Розовый
+        ];
+        // Сопоставляем размер с цветом
+        let sizeColorMap = {};
+        lengths.forEach((len, index) => {
+            sizeColorMap[len] = colorPalette[index % colorPalette.length];
+        });
+        
         for (let idx=0; idx<plan.length; idx++) {
             let item = plan[idx];
             if (item.count === 0) continue;
@@ -368,19 +384,21 @@ function runCalc() {
             
             waText += `\n${idx+1}. Пилить: ${countTxt} (${item.count} реек)\n${partsText}${rest > 0.1 ? `, отход ${rest.toFixed(1)} см` : ''}\n`;
             
+            // --- СБОРКА ПОЛОСКИ С РАЗНЫМИ ЦВЕТАМИ ---
             let visual = '<div class="visual-slat">';
             let visUsed = 0;
             for (let i=0; i<lengths.length; i++) {
+                let currentLen = lengths[i];
+                let currentColor = sizeColorMap[currentLen] || '#007aff'; 
                 for (let c=0; c<item.pattern[i]; c++) {
-                    visual += `<div class="slat-part" style="flex-grow: ${lengths[i]}">${lengths[i]}</div>`;
-                    visUsed += lengths[i] + blade;
+                    visual += `<div class="slat-part" style="flex-grow: ${currentLen}; background: ${currentColor};">${currentLen}</div>`;
+                    visUsed += currentLen + blade;
                 }
             }
             let visRest = slatLen - visUsed;
             if (visRest > 0.1) visual += `<div class="slat-part color-waste" style="flex-grow: ${visRest}">${visRest.toFixed(1)}</div>`;
             visual += '</div>';
             
-            // Используем иконку по индексу (зацикливаем)
             let icon = icons[idx % icons.length];
             
             htmlMap += `
@@ -396,10 +414,9 @@ function runCalc() {
         document.getElementById('text_for_whatsapp').style.display = 'block';
         document.getElementById('map_area').innerHTML = htmlMap;
         
-        // --- УЛУЧШЕНИЕ 2: Активируем плавное появление ---
+        // --- Плавное появление ---
         const results = document.getElementById('results');
         results.style.display = 'block';
-        // Небольшая задержка, чтобы CSS transition сработала
         setTimeout(() => results.classList.add('visible'), 10);
         results.scrollIntoView({ behavior: 'smooth' });
         
