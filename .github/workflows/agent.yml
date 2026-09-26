@@ -18,7 +18,10 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install requests
 
       - name: Process Issue with Gemini
         env:
@@ -27,45 +30,45 @@ jobs:
           ISSUE_BODY: ${{ github.event.issue.body }}
         run: |
           python3 - << 'EOF'
-          import os, json, re, urllib.request
+          import os, re, requests
 
           api_key = os.environ.get("GEMINI_API_KEY")
           task = os.environ.get("ISSUE_TITLE", "") + "\n" + os.environ.get("ISSUE_BODY", "")
-          
+
+          if not os.path.exists("index.html"):
+              with open("index.html", "w", encoding="utf-8") as f:
+                  f.write("<!DOCTYPE html><html><head><meta charset='UTF-8'></head><body><h1>Раскрой МДФ</h1></body></html>")
+
           with open("index.html", "r", encoding="utf-8") as f:
               current_code = f.read()
 
           prompt = f"""Ты — автономный веб-разработчик.
-          Ниже представлен текущий код файла index.html инструмента для раскроя МДФ:
+          Ниже представлен текущий код файла index.html:
           ```html
           {current_code}
           ```
 
-          Задача от владельца проекта:
+          Задача от владельца:
           {task}
 
-          Внеси требуемые изменения в код. 
           ПРАВИЛА ОТВЕТА:
           1. Верни ИСКЛЮЧИТЕЛЬНО полный обновленный HTML-код от <!DOCTYPE html> до </html>.
-          2. Не пиши никаких пояснений, комментариев до или после кода.
-          3. Не используй обрамление markdown (никаких тройных кавычек ```). Только чистый код."""
+          2. Не пиши никаких пояснений и комментариев.
+          3. Не используй обрамление markdown (тройные кавычки). Только чистый код."""
 
-          url = f"[https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=](https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=){api_key}"
+          url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
           payload = {"contents": [{"parts": [{"text": prompt}]}]}
 
-          req = urllib.request.Request(
-              url,
-              data=json.dumps(payload).encode("utf-8"),
-              headers={"Content-Type": "application/json"}
-          )
+          resp = requests.post(url, json=payload, headers={"Content-Type": "application/json"})
+          data = resp.json()
 
-          with urllib.request.urlopen(req) as resp:
-              data = json.loads(resp.read().decode("utf-8"))
-              result_code = data["candidates"][0]["content"]["parts"][0]["text"].strip()
-              
-              # Очистка, если модель добавила тройные кавычки
-              result_code = re.sub(r"^```(?:html)?\s*", "", result_code)
-              result_code = re.sub(r"\s*```$", "", result_code)
+          if "candidates" not in data:
+              print("Gemini API Error:", data)
+              raise ValueError(f"API Error: {data.get('error', {}).get('message', 'Unknown error')}")
+
+          result_code = data["candidates"][0]["content"]["parts"][0]["text"].strip()
+          result_code = re.sub(r"^```(?:html)?\s*", "", result_code)
+          result_code = re.sub(r"\s*```$", "", result_code)
 
           with open("index.html", "w", encoding="utf-8") as f:
               f.write(result_code)
@@ -91,7 +94,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '✅ Готово! Код обновлен и отправлен в ветку main. Через минуту изменения будут видны на сайте.'
+              body: '✅ Готово! Код обновлен и сохранен в ветку main.'
             });
             await github.rest.issues.update({
               issue_number: context.issue.number,
