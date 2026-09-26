@@ -8,36 +8,90 @@
     <meta name="apple-mobile-web-app-title" content="Раскрой МДФ">
     <meta name="theme-color" content="#007aff">
     <title>Раскрой МДФ</title>
-    
+
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="manifest" href="manifest.json">
-    
+
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            background: #f5f5f7;
-            color: #1c1c1e;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-            padding: calc(env(safe-area-inset-top, 20px) + 10px) 16px 40px 16px;
+        :root {
+            --bg-page: #f2f2f7;
+            --card-bg: rgba(255, 255, 255, 0.82);
+            --card-border: rgba(255, 255, 255, 0.7);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.04);
+            --text-primary: #1c1c1e;
+            --text-secondary: #8e8e93;
+            --field-bg: rgba(242, 242, 247, 0.85);
+            --field-border: rgba(209, 209, 214, 0.6);
+            --chip-bg: rgba(255, 255, 255, 0.95);
+            --chip-border: rgba(0, 0, 0, 0.08);
+            --accent: #007aff;
+            --accent-gradient: linear-gradient(135deg, #007aff 0%, #0051cb 100%);
+            --accent-green: #34c759;
+            --accent-green-gradient: linear-gradient(135deg, #34c759 0%, #28a745 100%);
+            --waste-bg: #e5e5ea;
+            --waste-text: #8e8e93;
+            --divider: rgba(60, 60, 67, 0.12);
         }
-        
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-page: #000000;
+                --card-bg: rgba(28, 28, 30, 0.78);
+                --card-border: rgba(255, 255, 255, 0.1);
+                --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+                --text-primary: #ffffff;
+                --text-secondary: #98989f;
+                --field-bg: rgba(44, 44, 46, 0.8);
+                --field-border: rgba(72, 72, 74, 0.6);
+                --chip-bg: rgba(44, 44, 46, 0.9);
+                --chip-border: rgba(255, 255, 255, 0.12);
+                --accent: #0a84ff;
+                --accent-gradient: linear-gradient(135deg, #0a84ff 0%, #0063db 100%);
+                --accent-green: #30d158;
+                --accent-green-gradient: linear-gradient(135deg, #30d158 0%, #248a3d 100%);
+                --waste-bg: #2c2c2e;
+                --waste-text: #636366;
+                --divider: rgba(255, 255, 255, 0.1);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--bg-page);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", sans-serif;
+            padding: calc(env(safe-area-inset-top, 20px) + 10px) 16px calc(env(safe-area-inset-bottom, 20px) + 40px) 16px;
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        /* --- STREAMING_CHUNK:Styling header and glass cards --- */
         .header {
             display: flex;
             align-items: center;
-            gap: 16px;
-            margin-bottom: 28px;
-            margin-top: 8px;
+            gap: 14px;
+            margin-bottom: 22px;
+            margin-top: 4px;
         }
         .header-icon {
-            width: 60px;
-            height: 60px;
-            background: rgba(0, 122, 255, 0.15);
-            border-radius: 20px;
+            width: 56px;
+            height: 56px;
+            background: var(--accent-gradient);
+            border-radius: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 8px 18px rgba(0, 122, 255, 0.3);
+            color: #ffffff;
+            font-size: 26px;
+            flex-shrink: 0;
             overflow: hidden;
         }
         .header-icon img {
@@ -45,195 +99,342 @@
             height: 100%;
             object-fit: cover;
         }
-        .header-text h1 { font-size: 28px; font-weight: 700; color: #1c1c1e; }
-        .header-text p { font-size: 14px; color: #6c6c70; }
-        
-        /* --- Эффект стекла (Glassmorphism) --- */
-        .card {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 24px 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.04), 0 0 0 0.5px rgba(0,0,0,0.02);
-            border: 1px solid rgba(255,255,255,0.6);
+        .header-text h1 {
+            font-size: 25px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
-        
-        /* --- Декоративная линия под заголовками --- */
-        .section-title {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            position: relative;
-            padding-bottom: 10px;
-        }
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 40px;
-            height: 3px;
-            background: linear-gradient(90deg, #007aff, #34c759);
-            border-radius: 4px;
-        }
-        
-        label {
+        .header-text p {
             font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 2px;
             font-weight: 500;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: 24px;
+            padding: 20px 18px;
+            margin-bottom: 18px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--card-border);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* --- STREAMING_CHUNK:Styling quick size buttons and presets --- */
+        .presets-label {
+            font-size: 12px;
+            font-weight: 600;
             text-transform: uppercase;
-            color: #6c6c70;
-            display: block;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        .presets-box {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .preset-row {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding-bottom: 2px;
+        }
+        .preset-row::-webkit-scrollbar { display: none; }
+        .preset-btn {
+            background: var(--chip-bg);
+            border: 1px solid var(--chip-border);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .preset-btn:active {
+            transform: scale(0.92);
+            background: var(--accent);
+            color: #ffffff;
+            border-color: var(--accent);
+        }
+
+        /* --- STREAMING_CHUNK:Styling textarea inputs and clear button --- */
+        .textarea-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 6px;
         }
+        label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+        .btn-reset {
+            background: transparent;
+            border: none;
+            color: #ff3b30;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: background 0.15s;
+        }
+        .btn-reset:active {
+            background: rgba(255, 59, 48, 0.1);
+        }
+
         textarea, input {
             width: 100%;
-            background: rgba(245, 245, 247, 0.8);
-            border: 1px solid rgba(233, 233, 239, 0.6);
+            background: var(--field-bg);
+            border: 1px solid var(--field-border);
             border-radius: 14px;
-            padding: 14px 16px;
+            padding: 13px 14px;
             font-size: 16px;
-            color: #1c1c1e;
-            margin-bottom: 20px;
+            color: var(--text-primary);
             outline: none;
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            font-family: inherit;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 90px;
+            line-height: 1.4;
+            font-variant-numeric: tabular-nums;
         }
         textarea:focus, input:focus {
-            border-color: #007aff;
-            box-shadow: 0 0 0 3px rgba(0,122,255,0.1);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
         }
-        .input-group { display: flex; gap: 12px; flex-wrap: wrap; }
-        .input-group > div { flex: 1; min-width: 100px; }
-        
-        /* --- Градиентная кнопка --- */
+
+        .input-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 14px;
+            margin-bottom: 16px;
+        }
+        .input-group > div { min-width: 0; }
+        .input-hint {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* --- STREAMING_CHUNK:Styling primary button and whatsapp action --- */
         button.primary {
-            background: linear-gradient(145deg, #007aff, #0055d4);
-            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.35);
+            background: var(--accent-gradient);
+            box-shadow: 0 6px 18px rgba(0, 122, 255, 0.35);
             border: none;
-            color: white;
-            border-radius: 14px;
+            color: #ffffff;
+            border-radius: 16px;
             padding: 16px;
             font-size: 17px;
-            font-weight: 600;
+            font-weight: 700;
             width: 100%;
             cursor: pointer;
-            margin-top: 8px;
-            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s;
         }
         button.primary:active {
-            transform: scale(0.96);
-            box-shadow: 0 2px 6px rgba(0, 122, 255, 0.25);
+            transform: scale(0.97);
+            box-shadow: 0 2px 8px rgba(0, 122, 255, 0.25);
         }
-        
-        .copy-btn {
-            background: #34c759;
-            color: #000;
+
+        .action-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
             margin-bottom: 20px;
+        }
+        .action-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             border: none;
             border-radius: 14px;
-            padding: 16px;
-            font-size: 17px;
+            padding: 14px 12px;
+            font-size: 14px;
             font-weight: 600;
-            width: 100%;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: transform 0.15s, opacity 0.15s;
         }
-        .copy-btn:active { transform: scale(0.96); background: #28a745; }
-        
+        .action-btn:active {
+            transform: scale(0.96);
+            opacity: 0.9;
+        }
+        .btn-wa {
+            background: #25d366;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.25);
+        }
+        .btn-copy {
+            background: var(--field-bg);
+            border: 1px solid var(--field-border);
+            color: var(--text-primary);
+        }
+
+        /* --- STREAMING_CHUNK:Styling statistics cards and results grid --- */
         .results-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
         }
         .result-item {
-            flex: 1;
-            background: rgba(245, 245, 247, 0.8);
+            background: var(--field-bg);
+            border-radius: 16px;
+            padding: 14px 8px;
+            text-align: center;
+            border: 1px solid var(--field-border);
+        }
+        .result-item .value {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+        }
+        .result-item .label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* --- STREAMING_CHUNK:Styling flat cut diagrams and slats --- */
+        .instruction-card {
+            background: var(--field-bg);
             border-radius: 18px;
             padding: 16px;
-            text-align: center;
-            border: 0.5px solid rgba(233, 233, 239, 0.6);
+            margin-bottom: 14px;
+            border: 1px solid var(--field-border);
         }
-        .result-item .value { font-size: 32px; font-weight: 700; color: #007aff; }
-        .result-item .label { font-size: 13px; color: #6c6c70; margin-top: 6px; }
-        
-        /* --- ВОЗВРАТ: Плоские ровные полоски без скруглений и теней --- */
+        .inst-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            margin-bottom: 8px;
+            font-size: 15px;
+            color: var(--text-primary);
+        }
+        .inst-badge {
+            background: rgba(0, 122, 255, 0.12);
+            color: var(--accent);
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .pattern-text {
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 13px;
+            background: var(--card-bg);
+            padding: 10px 12px;
+            border-radius: 12px;
+            margin: 8px 0;
+            border: 1px solid var(--divider);
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
         .visual-slat {
             height: 44px;
-            background: #e9e9ef; /* Цвет для отходов */
+            background: var(--waste-bg);
             display: flex;
-            margin: 16px 0 12px 0;
-            border-radius: 0; /* Убрали скругление */
-            overflow: hidden; /* Убрали, чтобы не было лишнего обрезания (но оставил для безопасности) */
+            margin: 12px 0 4px 0;
+            border-radius: 0;
+            overflow: hidden;
         }
         .slat-part {
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 12px;
-            font-weight: 600;
-            color: white;
-            border-right: 1px solid rgba(255,255,255,0.3); /* Лёгкая граница между кусками */
+            font-weight: 700;
+            color: #ffffff;
+            border-right: 1px solid rgba(255, 255, 255, 0.35);
+            min-width: 20px;
+            overflow: hidden;
+            white-space: nowrap;
         }
         .color-waste {
-            background: #e9e9ef !important; /* Цвет отхода */
-            color: #8e8e93;
-            font-weight: 500;
+            background: var(--waste-bg) !important;
+            color: var(--waste-text) !important;
+            font-weight: 600;
             border-right: none;
         }
-        
-        /* --- Микро-анимация карточек схем --- */
-        .instruction-card {
-            background: rgba(245, 245, 247, 0.8);
-            border-radius: 18px;
-            padding: 16px;
-            margin-bottom: 14px;
-            border: 0.5px solid rgba(233, 233, 239, 0.6);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .instruction-card:active {
-            transform: scale(0.98);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-        .inst-header {
-            font-weight: 600;
-            margin-bottom: 8px;
-            font-size: 16px;
-            color: #007aff;
-        }
-        .pattern-text {
-            font-family: monospace;
-            font-size: 14px;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 8px 12px;
-            border-radius: 12px;
-            margin: 8px 0;
-        }
-        
+
         #text_for_whatsapp {
-            width: 100%;
-            background: rgba(245, 245, 247, 0.8);
-            border: 1px solid rgba(233, 233, 239, 0.6);
-            border-radius: 14px;
-            padding: 14px;
-            font-family: monospace;
-            font-size: 13px;
-            margin-bottom: 12px;
             display: none;
-            resize: vertical;
         }
 
-        /* --- Плавное появление результатов --- */
         #results {
             display: none;
             opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform: translateY(16px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
         }
         #results.visible {
             opacity: 1;
             transform: translateY(0);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: calc(env(safe-area-inset-bottom, 20px) + 20px);
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: rgba(30, 30, 32, 0.95);
+            color: #ffffff;
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 10px 24px rgba(0,0,0,0.25);
+            backdrop-filter: blur(10px);
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
         }
     </style>
 </head>
@@ -241,63 +442,196 @@
 
 <div class="header">
     <div class="header-icon">
-        <img src="icon.png" alt="Дисковая пила с линейкой">
+        <img src="icon.png" alt="Пила" onerror="this.parentNode.innerHTML='🪚'">
     </div>
     <div class="header-text">
         <h1>Раскрой МДФ</h1>
-        <p>Влад косяк </p>
+        <p>Калькулятор и карты раскроя</p>
     </div>
 </div>
 
 <div class="card">
-    <div class="section-title">📐 Параметры расчёта</div>
-    <label>Заказ (ШхВ - Кол-во):</label>
-    <textarea id="order_input">30х20 - 350
-40х25 - 200</textarea>
-    <div class="input-group">
-        <div><label>Рейка (см):</label><input type="number" id="slat_len" value="272" step="any"></div>
-        <div><label>В пачке (шт):</label><input type="number" id="pack_size" value="26"></div>
-        <div><label>Диск (мм):</label><input type="number" id="blade" value="3" step="any"></div>
+    <div class="section-header">
+        <div class="section-title">📐 Параметры расчёта</div>
     </div>
-    <button class="primary" onclick="runCalc()">🪚 РАССЧИТАТЬ</button>
+
+    <div class="presets-label">⚡️ Быстрый выбор размеров:</div>
+    <div class="presets-box">
+        <div class="preset-row">
+            <button type="button" class="preset-btn" onclick="addSize('30х20')">30х20</button>
+            <button type="button" class="preset-btn" onclick="addSize('40х30')">40х30</button>
+            <button type="button" class="preset-btn" onclick="addSize('60х40')">60х40</button>
+            <button type="button" class="preset-btn" onclick="addSize('70х50')">70х50</button>
+            <button type="button" class="preset-btn" onclick="addSize('60х80')">60х80</button>
+        </div>
+        <div class="preset-row">
+            <button type="button" class="preset-btn" onclick="addSize('20х50')">20х50</button>
+            <button type="button" class="preset-btn" onclick="addSize('20х60')">20х60</button>
+            <button type="button" class="preset-btn" onclick="addSize('20х70')">20х70</button>
+        </div>
+        <div class="preset-row">
+            <button type="button" class="preset-btn" onclick="addSize('25х52')">25х52</button>
+            <button type="button" class="preset-btn" onclick="addSize('25х66')">25х66</button>
+            <button type="button" class="preset-btn" onclick="addSize('25х80')">25х80</button>
+        </div>
+    </div>
+
+    <div class="textarea-header">
+        <label for="order_input">Заказ (ШхВ - Кол-во):</label>
+        <button type="button" class="btn-reset" onclick="clearOrder()">✕ Сброс</button>
+    </div>
+    <textarea id="order_input" placeholder="30х20 - 350&#10;40х25 - 200">30х20 - 350
+40х25 - 200</textarea>
+
+    <div class="input-group">
+        <div>
+            <label for="slat_len">Рейка (см)</label>
+            <input type="number" id="slat_len" value="272" step="any">
+            <div class="input-hint">Длина</div>
+        </div>
+        <div>
+            <label for="pack_size">В пачке (шт)</label>
+            <input type="number" id="pack_size" value="26">
+            <div class="input-hint">Пачка</div>
+        </div>
+        <div>
+            <label for="blade">Диск (мм)</label>
+            <input type="number" id="blade" value="3" step="any">
+            <div class="input-hint">Пропил</div>
+        </div>
+    </div>
+
+    <button class="primary" onclick="runCalc()">
+        <span>🪚 РАССЧИТАТЬ</span>
+    </button>
 </div>
 
 <div class="card" id="results">
-    <div class="section-title">📊 Результаты</div>
+    <div class="section-title" style="margin-bottom: 16px;">📊 Результаты</div>
+
     <div id="stats_area"></div>
-    <div class="section-title">📋 Заказ в распил</div>
+
+    <div class="section-title" style="margin-bottom: 12px;">📋 Заказ в распил</div>
+
+    <div class="action-row">
+        <button class="action-btn btn-wa" onclick="sendWhatsApp()">
+            <span>📲 В WhatsApp</span>
+        </button>
+        <button class="action-btn btn-copy" onclick="copyText()">
+            <span>📋 Скопировать</span>
+        </button>
+    </div>
+
     <textarea id="text_for_whatsapp" readonly></textarea>
-    <button class="copy-btn" onclick="copyText()">📲 Скопировать для WhatsApp</button>
-    <div class="section-title">🛠 Схема распила</div>
+
+    <div class="section-title" style="margin-bottom: 14px;">🛠 Схема распила</div>
     <div id="map_area"></div>
 </div>
 
+<div class="toast" id="toast">
+    <span id="toast_icon">✅</span>
+    <span id="toast_msg">Готово</span>
+</div>
+
 <script>
+const STORAGE_KEY = 'mdf_cutting_settings_user';
+
+window.addEventListener('DOMContentLoaded', () => {
+    loadSettings();
+    document.querySelectorAll('.input-group input').forEach(input => {
+        input.addEventListener('change', saveSettings);
+    });
+});
+
+function saveSettings() {
+    const settings = {
+        slat_len: document.getElementById('slat_len').value,
+        pack_size: document.getElementById('pack_size').value,
+        blade: document.getElementById('blade').value
+    };
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    } catch (e) {
+        console.warn('Storage unavailable', e);
+    }
+}
+
+function loadSettings() {
+    try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) return;
+        const parsed = JSON.parse(saved);
+        if (parsed.slat_len) document.getElementById('slat_len').value = parsed.slat_len;
+        if (parsed.pack_size) document.getElementById('pack_size').value = parsed.pack_size;
+        if (parsed.blade) document.getElementById('blade').value = parsed.blade;
+    } catch (e) {
+        console.warn('Error loading settings', e);
+    }
+}
+
+function addSize(size) {
+    const textarea = document.getElementById('order_input');
+    const lineToAdd = `${size} - 100`;
+    
+    if (textarea.value.trim() === '') {
+        textarea.value = lineToAdd;
+    } else {
+        textarea.value = textarea.value.trimEnd() + '\n' + lineToAdd;
+    }
+    textarea.focus();
+    showToast(`Добавлен: ${size}`);
+}
+
+function clearOrder() {
+    const textarea = document.getElementById('order_input');
+    textarea.value = '';
+    textarea.focus();
+    showToast('Список очищен', '🗑');
+}
+
+function showToast(text, icon = '✅') {
+    const toast = document.getElementById('toast');
+    document.getElementById('toast_msg').innerText = text;
+    document.getElementById('toast_icon').innerText = icon;
+    toast.classList.add('show');
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 2000);
+}
+
 function runCalc() {
     try {
-        let orderText = document.getElementById('order_input').value;
-        let slatLen = parseFloat(document.getElementById('slat_len').value);
-        let packSize = parseInt(document.getElementById('pack_size').value);
-        let bladeMM = parseFloat(document.getElementById('blade').value);
-        let blade = bladeMM / 10;
-        
+        const orderText = document.getElementById('order_input').value;
+        const slatLen = parseFloat(document.getElementById('slat_len').value);
+        const packSize = parseInt(document.getElementById('pack_size').value, 10);
+        const bladeMM = parseFloat(document.getElementById('blade').value);
+        const blade = bladeMM / 10; // мм в см
+
         if (!orderText.trim()) throw new Error('Введите заказ');
         if (isNaN(slatLen) || slatLen <= 0) throw new Error('Длина рейки > 0');
-        
+        if (isNaN(packSize) || packSize <= 0) throw new Error('В пачке > 0');
+
         let demands = {};
-        let regex = /(\d+(?:\.\d+)?)[\sхxX×*](\d+(?:\.\d+)?)[\s\-:=]+(\d+)/g;
+        let regex = /(\d+(?:[.,]\d+)?)\s*[хxX×*]\s*(\d+(?:[.,]\d+)?)\s*[\s\-:=]+\s*(\d+)/g;
         let m;
         while ((m = regex.exec(orderText)) !== null) {
-            let w = parseFloat(m[1]), h = parseFloat(m[2]), qty = parseInt(m[3]);
+            let w = parseFloat(m[1].replace(',', '.'));
+            let h = parseFloat(m[2].replace(',', '.'));
+            let qty = parseInt(m[3], 10);
             demands[w] = (demands[w] || 0) + qty * 2;
             demands[h] = (demands[h] || 0) + qty * 2;
         }
-        if (Object.keys(demands).length === 0) throw new Error('Формат: 30х20 - 350');
-        
-        let lengths = Object.keys(demands).map(Number).sort((a,b)=>b-a);
-        
+
+        if (Object.keys(demands).length === 0) {
+            throw new Error('Формат: 30х20 - 350');
+        }
+
+        let lengths = Object.keys(demands).map(Number).sort((a, b) => b - a);
+
+        // Исходная проверенная логика генерации вариантов раскроя
         let patterns = [];
         let cur = new Array(lengths.length).fill(0);
+
         function generate(idx, usedLen) {
             if (idx === lengths.length) {
                 if (usedLen > 0) patterns.push([...cur]);
@@ -306,31 +640,35 @@ function runCalc() {
             let maxCnt = Math.floor((slatLen - usedLen) / (lengths[idx] + blade));
             for (let i = maxCnt; i >= 0; i--) {
                 cur[idx] = i;
-                generate(idx+1, usedLen + i * (lengths[idx] + blade));
+                generate(idx + 1, usedLen + i * (lengths[idx] + blade));
             }
         }
         generate(0, 0);
-        
+
+        if (patterns.length === 0) {
+            throw new Error('Ни одна деталь не влезает в рейку!');
+        }
+
         let need = {};
         for (let k in demands) need[k] = demands[k];
-        
+
         let plan = [];
         let safety = 0;
-        
+
         function hasNeed() {
             for (let k in need) if (need[k] > 0) return true;
             return false;
         }
-        
+
         while (hasNeed() && safety++ < 2000) {
             let bestPattern = null;
             let bestScore = -Infinity;
-            
+
             for (let p of patterns) {
                 let usedLen = 0;
                 let score = 0;
                 let hits = false;
-                for (let i=0; i<lengths.length; i++) {
+                for (let i = 0; i < lengths.length; i++) {
                     let cnt = p[i];
                     if (cnt === 0) continue;
                     let len = lengths[i];
@@ -349,38 +687,37 @@ function runCalc() {
                 }
             }
             if (!bestPattern) break;
-            
+
             let steps = Infinity;
-            for (let i=0; i<lengths.length; i++) {
+            for (let i = 0; i < lengths.length; i++) {
                 if (bestPattern[i] > 0 && need[lengths[i]] > 0) {
                     steps = Math.min(steps, Math.ceil(need[lengths[i]] / bestPattern[i]));
                 }
             }
             if (!isFinite(steps)) steps = 1;
-            
-            for (let i=0; i<lengths.length; i++) {
+
+            for (let i = 0; i < lengths.length; i++) {
                 need[lengths[i]] -= bestPattern[i] * steps;
             }
             plan.push({ pattern: bestPattern, count: steps });
         }
-        
-        let totalSticks = plan.reduce((s,item)=>s+item.count,0);
+
+        let totalSticks = plan.reduce((s, item) => s + item.count, 0);
         let packs = Math.floor(totalSticks / packSize);
         let loose = totalSticks % packSize;
-        
+
         document.getElementById('stats_area').innerHTML = `
             <div class="results-grid">
-                <div class="result-item"><div class="value">${totalSticks} шт</div><div class="label">Всего реек</div></div>
+                <div class="result-item"><div class="value">${totalSticks}</div><div class="label">Всего реек</div></div>
                 <div class="result-item"><div class="value">${packs}</div><div class="label">Пачек</div></div>
-                <div class="result-item"><div class="value">${loose}</div><div class="label">Остаток</div></div>
+                <div class="result-item"><div class="value">${loose}</div><div class="label">Остаток шт</div></div>
             </div>
         `;
-        
+
         let waText = `📦 ЗАКАЗ В РАСПИЛ\nВсего реек: ${totalSticks} шт (${packs} пач. + ${loose} шт.)\n\n🛠 КАРТА РАСПИЛА:\n`;
         let htmlMap = '';
-        
+
         const icons = ['🟢', '🟠', '🟣', '🔴', '🟡', '🔵', '🟤', '⚪️'];
-        
         const colorPalette = [
             '#007aff', '#34c759', '#ff9500', '#af52de', 
             '#ff3b30', '#ffcc00', '#5ac8fa', '#ff2d92'
@@ -389,85 +726,120 @@ function runCalc() {
         lengths.forEach((len, index) => {
             sizeColorMap[len] = colorPalette[index % colorPalette.length];
         });
-        
-        for (let idx=0; idx<plan.length; idx++) {
+
+        for (let idx = 0; idx < plan.length; idx++) {
             let item = plan[idx];
             if (item.count === 0) continue;
             let pCount = Math.floor(item.count / packSize);
             let lCount = item.count % packSize;
             let countTxt = pCount > 0 ? (pCount + ' пач.' + (lCount > 0 ? ` и ${lCount} шт.` : '')) : (lCount + ' шт.');
-            
+
             let counts = {};
-            for (let i=0; i<lengths.length; i++) {
+            for (let i = 0; i < lengths.length; i++) {
                 if (item.pattern[i] > 0) {
                     counts[lengths[i]] = item.pattern[i];
                 }
             }
-            
+
             let partsList = [];
             for (let len in counts) {
                 partsList.push(`${len} см — ${counts[len]} шт`);
             }
             let partsText = partsList.join(', ');
-            
+
             let usedLenTotal = 0;
-            for (let i=0; i<lengths.length; i++) {
+            for (let i = 0; i < lengths.length; i++) {
                 usedLenTotal += item.pattern[i] * (lengths[i] + blade);
             }
             let rest = slatLen - usedLenTotal;
-            
-            waText += `\n${idx+1}. Пилить: ${countTxt} (${item.count} реек)\n${partsText}${rest > 0.1 ? `, отход ${rest.toFixed(1)} см` : ''}\n`;
-            
-            // --- СБОРКА ПОЛОСКИ БЕЗ СКРУГЛЕНИЙ ---
+
+            waText += `\n${idx + 1}. Пилить: ${countTxt} (${item.count} реек)\n${partsText}${rest > 0.1 ? `, отход ${rest.toFixed(1)} см` : ''}\n`;
+
+            // Плоские цветные полоски без скруглений с серым остатком
             let visual = '<div class="visual-slat">';
             let visUsed = 0;
-            for (let i=0; i<lengths.length; i++) {
+            for (let i = 0; i < lengths.length; i++) {
                 let currentLen = lengths[i];
-                let currentColor = sizeColorMap[currentLen] || '#007aff'; 
-                for (let c=0; c<item.pattern[i]; c++) {
+                let currentColor = sizeColorMap[currentLen] || '#007aff';
+                for (let c = 0; c < item.pattern[i]; c++) {
                     visual += `<div class="slat-part" style="flex-grow: ${currentLen}; background: ${currentColor};">${currentLen}</div>`;
                     visUsed += currentLen + blade;
                 }
             }
             let visRest = slatLen - visUsed;
-            if (visRest > 0.1) visual += `<div class="slat-part color-waste" style="flex-grow: ${visRest}">${visRest.toFixed(1)}</div>`;
+            if (visRest > 0.1) {
+                visual += `<div class="slat-part color-waste" style="flex-grow: ${visRest}">${visRest.toFixed(1)}</div>`;
+            }
             visual += '</div>';
-            
+
             let icon = icons[idx % icons.length];
-            
+
             htmlMap += `
                 <div class="instruction-card">
-                    <div class="inst-header">${icon} Схема #${idx+1} — Пилить: ${countTxt}</div>
+                    <div class="inst-header">
+                        <span>${icon} Схема #${idx + 1}</span>
+                        <span class="inst-badge">Пилить: ${countTxt}</span>
+                    </div>
                     <div class="pattern-text">📏 ${partsText}${rest > 0.1 ? `, отход ${rest.toFixed(1)} см` : ''}</div>
                     ${visual}
                 </div>
             `;
         }
-        
+
         document.getElementById('text_for_whatsapp').value = waText;
-        document.getElementById('text_for_whatsapp').style.display = 'block';
         document.getElementById('map_area').innerHTML = htmlMap;
-        
+
         const results = document.getElementById('results');
         results.style.display = 'block';
-        setTimeout(() => results.classList.add('visible'), 10);
-        results.scrollIntoView({ behavior: 'smooth' });
-        
-    } catch(e) {
-        alert('Ошибка: ' + e.message);
+        setTimeout(() => {
+            results.classList.add('visible');
+            results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 20);
+
+        saveSettings();
+
+    } catch (e) {
+        showToast(e.message, '⚠️');
     }
 }
 
 function copyText() {
     let txt = document.getElementById('text_for_whatsapp');
-    txt.select();
-    txt.setSelectionRange(0, 99999);
-    navigator.clipboard.writeText(txt.value).then(() => {
-        let btn = document.querySelector('.copy-btn');
-        let orig = btn.innerHTML;
-        btn.innerHTML = '✅ Скопировано!';
-        setTimeout(() => btn.innerHTML = orig, 2000);
-    });
+    if (!txt.value) {
+        showToast('Сначала рассчитайте заказ', '⚠️');
+        return;
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(txt.value).then(() => {
+            showToast('Скопировано для WhatsApp');
+        }).catch(() => fallbackCopy(txt));
+    } else {
+        fallbackCopy(txt);
+    }
+}
+
+function fallbackCopy(textarea) {
+    textarea.style.display = 'block';
+    textarea.focus();
+    textarea.select();
+    try {
+        document.execCommand('copy');
+        showToast('Скопировано в буфер!');
+    } catch (e) {
+        showToast('Ошибка копирования', '⚠️');
+    }
+    textarea.style.display = 'none';
+}
+
+function sendWhatsApp() {
+    let text = document.getElementById('text_for_whatsapp').value;
+    if (!text) {
+        showToast('Сначала рассчитайте заказ', '⚠️');
+        return;
+    }
+    let url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
 }
 </script>
 </body>
